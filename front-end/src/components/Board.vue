@@ -9,16 +9,25 @@
     :x="note.left"
     :y="note.top"
     :w="220"
-    :h="220"
-    v-on:dragging="dragg(note, $event)"
-    class="postit">
+    :h="250"
+    v-on:dragging="drag(note, $event)"
+    contentClass="postit">
     <div class="content">
       <VueShowdown
         :markdown="note.text"
         flavor="github"
         :options="{ emoji: true }"
+        @click="log(note.id)"
       />
-      <span>{{ note.text }}</span>
+      <textarea 
+        :name="note.id" 
+        :id="note.id" 
+        v-model="note.text"
+        cols="25" 
+        rows="4"
+        placeholder="add your markdown text"
+        >
+      </textarea>
       <p>{{ note.top }} х {{ note.left }} </p>
     </div>
   </VueDragResize>
@@ -43,12 +52,13 @@ export default {
       notes: [
         {
           id: 'note1',
-          text: `# This is the first note!
-          
-          - option 1
-          - option 2`,
+          text: `# This is the first note! 
+- option 1 
+- option 2
+
+> the present is our past.`,
           top: 333,
-          left: 333 
+          left: 300 
         },
         {
           id: 'note2',
@@ -58,13 +68,16 @@ export default {
         },
         {
           id: 'note3',
-          text: '## This is the third note!',
+          text: "It's very easy to make some words **bold** and other words *italic* with Markdown. You can even [link to Google!](http://google.com)",
           top: 400,
           left: 700 
         },
         {
           id: 'note4',
-          text: '### This is the fourth note!',
+          text: `First Header | Second Header
+------------ | -------------
+Content from cell 1 | Content from cell 2
+Content in the first column | Content in the second column`,
           top: 200,
           left: 3 
         }
@@ -77,24 +90,22 @@ export default {
   },
 
   methods: {
-    drag(newRect) {
-      console.log('### ', newRect);
-      this.top = newRect.top;
-      this.left = newRect.left;
-    },
-    dragg(note, newRect) {
+    drag(note, newRect) {
       note.top = newRect.top;
       note.left = newRect.left;
     },
+    edit(note) {
+      console.log(note);
+    },
+    log(msg) {
+      console.log('message: ',msg);
+    }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 20px 0 0;
-}
 ul {
   list-style-type: none;
   padding: 0;
@@ -118,5 +129,13 @@ a {
   background: -ms-linear-gradient(-45deg, #ffff88 81%,#ffff88 82%,#ffff88 82%,#ffffc6 100%); /* IE10+ */
   background: linear-gradient(135deg, #ffff88 81%,#ffff88 82%,#ffff88 82%,#ffffc6 100%); /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffff88', endColorstr='#ffffc6',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}
+.content {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+
+  height:200px;
+  overflow-y: auto;
 }
 </style>

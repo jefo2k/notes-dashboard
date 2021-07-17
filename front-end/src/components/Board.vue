@@ -13,7 +13,12 @@
     v-on:dragging="dragg(note, $event)"
     class="postit">
     <div class="content">
-      <h3>{{ note.text }}</h3>
+      <VueShowdown
+        :markdown="note.text"
+        flavor="github"
+        :options="{ emoji: true }"
+      />
+      <span>{{ note.text }}</span>
       <p>{{ note.top }} х {{ note.left }} </p>
     </div>
   </VueDragResize>
@@ -38,25 +43,28 @@ export default {
       notes: [
         {
           id: 'note1',
-          text: 'This is the first note!',
+          text: `# This is the first note!
+          
+          - option 1
+          - option 2`,
           top: 333,
           left: 333 
         },
         {
           id: 'note2',
-          text: 'This is the second note!',
+          text: '## This is the second note! :smiley:',
           top: 98,
           left: 733 
         },
         {
           id: 'note3',
-          text: 'This is the third note!',
+          text: '## This is the third note!',
           top: 400,
           left: 700 
         },
         {
           id: 'note4',
-          text: 'This is the fourth note!',
+          text: '### This is the fourth note!',
           top: 200,
           left: 3 
         }

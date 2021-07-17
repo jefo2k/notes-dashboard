@@ -4,7 +4,6 @@ import { VueShowdownPlugin } from 'vue-showdown';
 import App from './App.vue';
 
 const app = createApp(App);
-app.mount('#app');
 
 // the second parameter of app.use() is optional
 app.use(VueShowdownPlugin, {
@@ -15,3 +14,5 @@ app.use(VueShowdownPlugin, {
     emoji: false,
   },
 });
+
+app.mount('#app');

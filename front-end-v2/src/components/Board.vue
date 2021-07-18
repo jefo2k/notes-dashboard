@@ -12,6 +12,11 @@
       v-on:dragging="drag(note, $event)"
       contentClass="postit">
       <div class="content">
+        <VueShowdown
+          :markdown="note.text"
+          @click="edit(note)"
+        />
+
         <p>{{ note.top }} х {{ note.left }}</p>
       </div>
     </VueDragResize>

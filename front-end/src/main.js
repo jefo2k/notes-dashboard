@@ -1,5 +1,7 @@
 import { createApp } from 'vue'
 import { VueShowdownPlugin } from 'vue-showdown';
+import { Button, Modal } from 'ant-design-vue';
+import 'ant-design-vue/dist/antd.css';
 
 import App from './App.vue';
 
@@ -11,8 +13,11 @@ app.use(VueShowdownPlugin, {
   flavor: 'github',
   // set default options of showdown (will override the flavor options)
   options: {
-    emoji: false,
+    emoji: true,
   },
 });
+
+app.use(Button);
+app.use(Modal);
 
 app.mount('#app');

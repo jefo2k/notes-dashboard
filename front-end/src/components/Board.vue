@@ -12,29 +12,42 @@
     :h="250"
     v-on:dragging="drag(note, $event)"
     contentClass="postit">
-    <div class="content">
+    <div class="content">      
       <VueShowdown
         :markdown="note.text"
-        flavor="github"
-        :options="{ emoji: true }"
-        @click="log(note.id)"
+        @click="edit(note)"
       />
+
+      <textarea
+        v-if="note.inInEditMode"
+        :name="note.id"
+        :id="note.id"
+        :ref="note.id"
+        v-model="note.text"
+        cols="40"
+        rows="7"
+        placeholder="add your markdown text">
+      </textarea>
+
+      <p>{{ note.top }} х {{ note.left }} </p>
+    </div>
+    <!-- <a-modal v-model:visible="visible" title="Edit Note" @ok="handleOk">
       <textarea 
         :name="note.id" 
         :id="note.id" 
-        v-model="note.text"
-        cols="25" 
-        rows="4"
-        placeholder="add your markdown text"
-        >
+        v-model="note.text" 
+        cols="40" 
+        rows="7" 
+        placeholder="add your markdown text">
       </textarea>
-      <p>{{ note.top }} х {{ note.left }} </p>
-    </div>
+    </a-modal> -->
   </VueDragResize>
+
 </template>
 
 <script>
-import VueDragResize from 'vue-drag-resize'
+import { ref } from 'vue';
+import VueDragResize from 'vue-drag-resize';
 
 export default {
   name: 'Board',
@@ -47,9 +60,19 @@ export default {
     VueDragResize
   },
 
-  data() {
-    return {
-      notes: [
+  setup() {
+    const visible = ref(false);
+
+    const handleOk = e => {
+      console.log(e);
+    };
+
+    const drag = (note, newRect) => {
+      note.top = newRect.top;
+      note.left = newRect.left;
+    };
+
+    const notes = ref([
         {
           id: 'note1',
           text: `# This is the first note! 
@@ -58,19 +81,22 @@ export default {
 
 > the present is our past.`,
           top: 333,
-          left: 300 
+          left: 300,
+          inInEditMode: false
         },
         {
           id: 'note2',
           text: '## This is the second note! :smiley:',
           top: 98,
-          left: 733 
+          left: 733,
+          inInEditMode: false
         },
         {
           id: 'note3',
           text: "It's very easy to make some words **bold** and other words *italic* with Markdown. You can even [link to Google!](http://google.com)",
           top: 400,
-          left: 700 
+          left: 700,
+          inInEditMode: false
         },
         {
           id: 'note4',
@@ -79,28 +105,60 @@ export default {
 Content from cell 1 | Content from cell 2
 Content in the first column | Content in the second column`,
           top: 200,
-          left: 3 
+          left: 3,
+          inInEditMode: false 
         }
-      ],
-      width: 0,
-      height: 0,
-      top: 0,
-      left: 0
-    }
-  },
+      ]);
 
+    return {
+      visible,
+      notes,
+      handleOk,
+      drag
+    };
+  },
   methods: {
-    drag(note, newRect) {
-      note.top = newRect.top;
-      note.left = newRect.left;
-    },
     edit(note) {
-      console.log(note);
-    },
-    log(msg) {
-      console.log('message: ',msg);
+      // Modal.info({
+      //   title: 'Edit note',
+      //   content: h('div', {}, [
+      //     h('textarea', { 
+      //       name: note.id,
+      //       id: note.id,
+      //       value: note.text,
+      //       cols: "30",
+      //       rows: "7", 
+      //       placeholder: "add your markdown text"
+      //     }),
+      //   ]),
+      //   on: {
+      //     textarea: function (event) {
+      //       self.$emit('textarea', event.target.value)
+      //     }
+      //   },
+      //   onOk() {
+      //     console.log('ok');
+      //   },
+      // });
+      note.inInEditMode = true;
+      //this.$refs[note.id].focus();
+
+      console.log('### textAreas: ', this.textAreas);
+      for (let i in this.textAreas) {
+        console.log('### textArea: ', i);
+      }
+
+      console.log('### note: ', note);
+      console.log('### note.id: ', note.id);
+
+      console.log('### this.$refs: ', this.$refs);
+      // const textAreaRef = note.id;
+      console.log('### this.$refs[textAreaRef]: ', this.$refs[0]);
+      // this.$refs[textAreaRef].focus();
+
     }
   }
+
 }
 </script>
 

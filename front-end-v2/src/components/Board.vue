@@ -1,30 +1,49 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
+    <button @click="create()">Add note!</button>
+
     <VueDragResize 
       v-for="note in notes" :key="note.id"
       :isActive="true" 
       :isResizable="false"
       :x="note.left"
       :y="note.top"
-      :w="220"
-      :h="250"
+      :w="240"
+      :h="180"
       v-on:dragging="drag(note, $event)"
+      v-on:deactivated="save(note)"
       contentClass="postit">
-      <div class="content">
+
+      <div class="postit-text" @click="enableEditMode(note)">
         <VueShowdown
           :markdown="note.text"
-          @click="edit(note)"
         />
+      </div>
 
+      <div class="postit-form" @click="focus(note.id)">
+        <textarea
+          v-show="note.inInEditMode"
+          :name="note.id"
+          :id="note.id"
+          :ref="note.id"
+          v-model="note.text"
+          rows="7"
+          placeholder="add your markdown text">
+        </textarea>
+      </div>
+
+      <div class="postit-footer">
         <p>{{ note.top }} х {{ note.left }}</p>
       </div>
+
     </VueDragResize>
   </div>
 </template>
 
 <script>
 import VueDragResize from 'vue-drag-resize'
+import { v4 as uuidv4 } from 'uuid';
 
 export default {
   name: 'Board',
@@ -41,7 +60,7 @@ export default {
     return {
       notes: [
         {
-          id: 'note1',
+          id: uuidv4(),
           text: `# This is the first note! 
 - option 1 
 - option 2
@@ -52,21 +71,21 @@ export default {
           inInEditMode: false
         },
         {
-          id: 'note2',
+          id: uuidv4(),
           text: '## This is the second note! :smiley:',
           top: 98,
           left: 733,
           inInEditMode: false
         },
         {
-          id: 'note3',
+          id: uuidv4(),
           text: "It's very easy to make some words **bold** and other words *italic* with Markdown. You can even [link to Google!](http://google.com)",
           top: 400,
           left: 700,
           inInEditMode: false
         },
         {
-          id: 'note4',
+          id: uuidv4(),
           text: `First Header | Second Header
 ------------ | -------------
 Content from cell 1 | Content from cell 2
@@ -83,6 +102,38 @@ Content in the first column | Content in the second column`,
     drag(note, newRect) {
       note.top = newRect.top;
       note.left = newRect.left;
+    },
+
+    create() {
+      const newNote = {
+        id: uuidv4(),
+        text: `## New note :new:`,
+        top: this.randomIntFromInterval(),
+        left: this.randomIntFromInterval(),
+        inInEditMode: false
+      }
+
+      // persist data
+      this.notes.push(newNote);
+    },
+
+    save(note) {
+      note.inInEditMode = false;
+    },
+
+    enableEditMode(note) {
+      note.inInEditMode = true;
+      this.focus(note.id);
+    },
+
+    focus(refKey) {
+      if (this.$refs[refKey]) {
+        this.$refs[refKey][0].focus();
+      }
+    },
+
+    randomIntFromInterval(min = 50, max = 150) {
+      return Math.floor(Math.random() * (max - min + 1) + min)
     }
   }
   
@@ -91,6 +142,15 @@ Content in the first column | Content in the second column`,
 
 <style scoped>
 .postit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: 5px;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
   line-height: 1;
   border:1px solid #E8E8E8;
   
@@ -103,12 +163,16 @@ Content in the first column | Content in the second column`,
   background: linear-gradient(135deg, #ffff88 81%,#ffff88 82%,#ffff88 82%,#ffffc6 100%); /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffff88', endColorstr='#ffffc6',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 }
-.content {
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
 
-  height:200px;
-  overflow-y: auto;
+.postit-text {
+  padding: 5px;
+}
+
+.postit-text:hover {
+  border: 1px solid DodgerBlue;
+}
+
+.postit-form {
+  width: 100%;
 }
 </style>

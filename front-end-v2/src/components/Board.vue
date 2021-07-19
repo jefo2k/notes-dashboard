@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div>
     <h1>{{ msg }}</h1>
     <button @click="create()">Add note!</button>
 
@@ -12,9 +12,15 @@
       :w="240"
       :h="180"
       v-on:dragging="drag(note, $event)"
-      v-on:deactivated="save(note)"
+      v-on:deactivated="update(note)"
       contentClass="postit">
 
+      <div class="postit-header">
+        <button @click="remove(note.id)">x</button>
+        <span>{{ note.top }} х {{ note.left }}</span>
+        <span>{{ note.createdAt }}</span>
+      </div>
+      
       <div class="postit-text" @click="enableEditMode(note)">
         <VueShowdown
           :markdown="note.text"
@@ -32,11 +38,6 @@
           placeholder="add your markdown text">
         </textarea>
       </div>
-
-      <div class="postit-footer">
-        <p>{{ note.top }} х {{ note.left }}</p>
-      </div>
-
     </VueDragResize>
   </div>
 </template>
@@ -68,6 +69,7 @@ export default {
 > the present is our past.`,
           top: 333,
           left: 300,
+          createdAt: new Date().toLocaleString(),
           inInEditMode: false
         },
         {
@@ -75,6 +77,7 @@ export default {
           text: '## This is the second note! :smiley:',
           top: 98,
           left: 733,
+          createdAt: new Date().toLocaleString(),
           inInEditMode: false
         },
         {
@@ -82,6 +85,7 @@ export default {
           text: "It's very easy to make some words **bold** and other words *italic* with Markdown. You can even [link to Google!](http://google.com)",
           top: 400,
           left: 700,
+          createdAt: new Date().toLocaleString(),
           inInEditMode: false
         },
         {
@@ -92,6 +96,7 @@ Content from cell 1 | Content from cell 2
 Content in the first column | Content in the second column`,
           top: 200,
           left: 3,
+          createdAt: new Date().toLocaleString(),
           inInEditMode: false 
         }
       ]
@@ -110,6 +115,7 @@ Content in the first column | Content in the second column`,
         text: `## New note :new:`,
         top: this.randomIntFromInterval(),
         left: this.randomIntFromInterval(),
+        createdAt: new Date().toLocaleString(),
         inInEditMode: false
       }
 
@@ -117,7 +123,11 @@ Content in the first column | Content in the second column`,
       this.notes.push(newNote);
     },
 
-    save(note) {
+    remove(noteId) {
+      this.notes = this.notes.filter(n => n.id !== noteId);
+    },
+
+    update(note) {
       note.inInEditMode = false;
     },
 
@@ -162,6 +172,14 @@ Content in the first column | Content in the second column`,
   background: -ms-linear-gradient(-45deg, #ffff88 81%,#ffff88 82%,#ffff88 82%,#ffffc6 100%); /* IE10+ */
   background: linear-gradient(135deg, #ffff88 81%,#ffff88 82%,#ffff88 82%,#ffffc6 100%); /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffff88', endColorstr='#ffffc6',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}
+
+.postit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: .70rem;
 }
 
 .postit-text {

@@ -8,8 +8,11 @@ export class Note {
 
   constructor(
     private text: string, 
-    private top: number, 
-    private left: number) {
+    private top: number = 0,
+    private left: number = 0) {
+    // validate text field
+    if (!text || text.trim().length < 1 ) throw new Error('text must not be empty');
+
     this.id = uuid();
     this.text = text;
     this.top = top;

@@ -5,7 +5,7 @@ describe('Note entity tests', () => {
 
   const noteText = faker.random.words();
   const noteTop = faker.datatype.number(150);
-  const noteLeft = faker.datatype.number(150);
+  const noteLeft = faker.datatype.number(170);
 
   let note = null;
 
@@ -49,6 +49,22 @@ describe('Note entity tests', () => {
     expect(note.getTop()).toBe(newTop);
 
     expect(note.getCreatedAt()).not.toBe(note.getUpdatedAt());
+  })
+
+  it('should not instantiate Note with a null, undefined or empty text parameter', () => {
+    
+    expect(() => {
+      new Note(null, noteTop, noteLeft)
+    }).toThrowError('text must not be empty');
+    
+    expect(() => {
+      new Note(undefined, noteTop, noteLeft)
+    }).toThrowError('text must not be empty');
+    
+    expect(() => {
+      new Note('', noteTop, noteLeft)
+    }).toThrowError('text must not be empty');
+
   })
 
 })

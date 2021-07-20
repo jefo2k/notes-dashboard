@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ValidationPipe, UsePipes, ParseUUIDPipe } from '@nestjs/common';
 import { NotesService } from './notes.service';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
@@ -10,6 +10,7 @@ export class NotesController {
   ) {}
 
   @Post()
+  @UsePipes(ValidationPipe)
   async create(@Body() createNoteDto: CreateNoteDto) {
     return await this.notesService.create(createNoteDto);
   }
@@ -20,7 +21,7 @@ export class NotesController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
     const found = await this.notesService.findOne(id);
 
     if (!found) {
@@ -31,12 +32,13 @@ export class NotesController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateNoteDto: UpdateNoteDto) {
+  @UsePipes(ValidationPipe)
+  async update(@Param('id', ParseUUIDPipe) id: string, @Body() updateNoteDto: UpdateNoteDto) {
     return await this.notesService.update(id, updateNoteDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
     return await this.notesService.remove(id);
   }
 }

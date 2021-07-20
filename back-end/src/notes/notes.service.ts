@@ -1,26 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
+import { NotesInMemoryRepository } from './repository/in-memory/notes.in-memory.repository';
 
 @Injectable()
 export class NotesService {
-  create(createNoteDto: CreateNoteDto) {
-    return 'This action adds a new note';
+
+  constructor(private notesRepository: NotesInMemoryRepository) {}
+
+  async create(createNoteDto: CreateNoteDto) {
+    return await this.notesRepository.create(createNoteDto);
   }
 
-  findAll() {
-    return `This action returns all notes`;
+  async findAll() {
+    return await this.notesRepository.findAll();
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} note`;
+  async findOne(id: string) {
+    return await this.notesRepository.findOne(id);
   }
 
-  update(id: string, updateNoteDto: UpdateNoteDto) {
-    return `This action updates a #${id} note`;
+  async update(id: string, updateNoteDto: UpdateNoteDto) {
+    return await this.notesRepository.update(id, updateNoteDto);
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} note`;
+  async remove(id: string) {
+    return await this.notesRepository.remove(id);
   }
 }

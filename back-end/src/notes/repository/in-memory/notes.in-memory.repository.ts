@@ -1,7 +1,9 @@
+import { Injectable } from '@nestjs/common';
 import { CreateNoteDto, UpdateNoteDto } from 'src/notes/dto';
 import { Note } from '../../entities';
 import { NotesRepository } from '../ports';
 
+@Injectable()
 export class NotesInMemoryRepository implements NotesRepository {
 
   private notes: Array<Note> = [];

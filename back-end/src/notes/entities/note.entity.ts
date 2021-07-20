@@ -3,13 +3,13 @@ import { v4 as uuid } from 'uuid';
 export class Note {
 
   private id: string;
-  private text: string;
-  private top: number;
-  private left: number;
   private createdAt: Date;
   private updatedAt: Date;
 
-  constructor(text: string, top: number, left: number) {
+  constructor(
+    private text: string, 
+    private top: number, 
+    private left: number) {
     this.id = uuid();
     this.text = text;
     this.top = top;
@@ -63,4 +63,50 @@ export class Note {
     this.updatedAt = new Date();
   }
 
+  // handler methods for serialize and deserialize
+  // source: http://choly.ca/post/typescript-json/
+
+  // toJSON is automatically used by JSON.stringify
+  toJSON(): NoteJSON {
+    // copy all fields from `this` to an empty object and return in
+    return Object.assign({}, this, {
+      // convert fields that need converting
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString()
+    });
+  }
+
+  // fromJSON is used to convert an serialized version
+  // of the Note to an instance of the class
+  static fromJSON(json: NoteJSON|string): Note {
+    if (typeof json === 'string') {
+      // if it's a string, parse it first
+      return JSON.parse(json, Note.reviver);
+    } else {
+      // create an instance of the Note class
+      let note = Object.create(Note.prototype);
+      // copy all the fields from the json object
+      return Object.assign(note, json, {
+        // convert fields that need converting
+        createdAt: new Date(json.createdAt),
+        updatedAt: new Date(json.updatedAt)
+      });
+    }
+  }
+
+  // reviver can be passed as the second parameter to JSON.parse
+  // to automatically call User.fromJSON on the resulting value.
+  static reviver(key: string, value: any): any {
+    return key === "" ? Note.fromJSON(value) : value;
+  }
+
+}
+
+interface NoteJSON {
+  id: string;
+  text: string;
+  top: number;
+  left: number;
+  createdAt: string;
+  updatedAt: string;
 }

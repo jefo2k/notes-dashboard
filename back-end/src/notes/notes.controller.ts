@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ValidationPipe, UsePipes, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ValidationPipe, UsePipes, ParseUUIDPipe, Logger } from '@nestjs/common';
 import { NotesService } from './notes.service';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 
 @Controller('notes')
 export class NotesController {
+  private readonly logger = new Logger(NotesController.name);
+
   constructor(
     private readonly notesService: NotesService
   ) {}
@@ -25,6 +27,7 @@ export class NotesController {
     const found = await this.notesService.findOne(id);
 
     if (!found) {
+      this.logger.error(`Note with ID ${id} not found`);
       throw new NotFoundException(`Note with ID ${id} not found`);
     }
 

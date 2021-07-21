@@ -2,7 +2,6 @@
 
 This is the back-end application that supports the Notes Board client.
 
-
 ## Installation
 
 ```bash

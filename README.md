@@ -20,3 +20,7 @@ First start the api, then the client:
 
 - [How start api](./back-end)
 - [How start client](./front-end)
+
+## License
+
+Notes Board is [MIT licensed](LICENSE).

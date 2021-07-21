@@ -1,7 +1,10 @@
 {
   "name": "front-end-v2",
   "version": "0.1.0",
+  "description": "Notes Board client",
+  "author": "Jefo",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",

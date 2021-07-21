@@ -11,8 +11,9 @@
       :y="note.top"
       :w="240"
       :h="180"
-      v-on:dragging="drag(note, $event)"
-      v-on:deactivated="update(note)"
+      @deactivated="setNoteOnEditionMode(null)"
+      @dragging="drag(note, $event)"
+      @dragstop="update(note)"
       contentClass="postit">
 
       <div class="postit-header">
@@ -21,7 +22,7 @@
         <span>{{ note.createdAt }}</span>
       </div>
       
-      <div class="postit-text" @click="enableEditMode(note)">
+      <div class="postit-text" @click="setNoteOnEditionMode(note.id)">
         <VueShowdown
           :markdown="note.text"
         />
@@ -29,7 +30,8 @@
 
       <div class="postit-form" @click="focus(note.id)">
         <textarea
-          v-show="note.inInEditMode"
+          v-show="noteOnEditionMode === note.id"
+          @blur="update(note); setNoteOnEditionMode(null);"
           :name="note.id"
           :id="note.id"
           :ref="note.id"
@@ -43,8 +45,7 @@
 </template>
 
 <script>
-import VueDragResize from 'vue-drag-resize'
-import { v4 as uuidv4 } from 'uuid';
+import VueDragResize from 'vue-drag-resize';
 
 export default {
   name: 'Board',
@@ -59,47 +60,8 @@ export default {
 
   data() {
     return {
-      notes: [
-        {
-          id: uuidv4(),
-          text: `# This is the first note! 
-- option 1 
-- option 2
-
-> the present is our past.`,
-          top: 333,
-          left: 300,
-          createdAt: new Date().toLocaleString(),
-          inInEditMode: false
-        },
-        {
-          id: uuidv4(),
-          text: '## This is the second note! :smiley:',
-          top: 98,
-          left: 733,
-          createdAt: new Date().toLocaleString(),
-          inInEditMode: false
-        },
-        {
-          id: uuidv4(),
-          text: "It's very easy to make some words **bold** and other words *italic* with Markdown. You can even [link to Google!](http://google.com)",
-          top: 400,
-          left: 700,
-          createdAt: new Date().toLocaleString(),
-          inInEditMode: false
-        },
-        {
-          id: uuidv4(),
-          text: `First Header | Second Header
------------- | -------------
-Content from cell 1 | Content from cell 2
-Content in the first column | Content in the second column`,
-          top: 200,
-          left: 3,
-          createdAt: new Date().toLocaleString(),
-          inInEditMode: false 
-        }
-      ]
+      notes: [],
+      noteOnEditionMode: null
     }
   },
 
@@ -109,31 +71,33 @@ Content in the first column | Content in the second column`,
       note.left = newRect.left;
     },
 
-    create() {
+    async loadAll() {
+      const response = await this.$http.get('notes');
+      this.notes = response.data;
+    },
+
+    async create() {
       const newNote = {
-        id: uuidv4(),
         text: `## New note :new:`,
         top: this.randomIntFromInterval(),
-        left: this.randomIntFromInterval(),
-        createdAt: new Date().toLocaleString(),
-        inInEditMode: false
+        left: this.randomIntFromInterval()
       }
 
-      // persist data
-      this.notes.push(newNote);
+      await this.$http.post('notes', newNote);
+
+      await this.loadAll();
     },
 
-    remove(noteId) {
-      this.notes = this.notes.filter(n => n.id !== noteId);
+    async remove(noteId) {
+      await this.$http.delete(`notes/${noteId}`);
+
+      await this.loadAll();
     },
 
-    update(note) {
-      note.inInEditMode = false;
-    },
+    async update(note) {
+      await this.$http.patch(`notes/${note.id}`, note);
 
-    enableEditMode(note) {
-      note.inInEditMode = true;
-      this.focus(note.id);
+      await this.loadAll();
     },
 
     focus(refKey) {
@@ -142,9 +106,17 @@ Content in the first column | Content in the second column`,
       }
     },
 
+    setNoteOnEditionMode(noteId) {
+      this.noteOnEditionMode = noteId;
+    },
+
     randomIntFromInterval(min = 50, max = 150) {
       return Math.floor(Math.random() * (max - min + 1) + min)
     }
+  },
+
+  created(){
+    this.loadAll();
   }
   
 }

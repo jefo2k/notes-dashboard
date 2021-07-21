@@ -1,8 +1,10 @@
-import Vue from 'vue'
-import VueShowdown from 'vue-showdown'
-import App from './App.vue'
+import Vue from 'vue';
+import App from './App.vue';
+import VueShowdown from 'vue-showdown';
+import api from './config/api';
 
-Vue.config.productionTip = false
+Vue.prototype.$http = api;
+Vue.config.productionTip = false;
 
 // the second parameter of Vue.use() is optional
 Vue.use(VueShowdown, {
@@ -16,4 +18,4 @@ Vue.use(VueShowdown, {
 
 new Vue({
   render: h => h(App),
-}).$mount('#app')
+}).$mount('#app');

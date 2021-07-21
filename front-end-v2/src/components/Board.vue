@@ -73,9 +73,13 @@ export default {
     },
 
     async loadAll() {
-      const response = await this.$http.get('notes');
-
-      this.notes = response.data;
+      try {
+        const response = await this.$http.get('notes');
+        this.notes = response.data;
+      } catch (error) {
+        this.$message.error('Error loading notes...', 2.5);
+        console.log(error);
+      }
     },
 
     async create() {
@@ -86,24 +90,39 @@ export default {
       }
 
       this.$message.loading({ content: 'Creating note...', key: newNote.top });
-      await this.$http.post('notes', newNote);
-      this.$message.success({ content: 'Note created', key: newNote.top }, 2.5);
+      try {
+        await this.$http.post('notes', newNote);
+        this.$message.success({ content: 'Note created', key: newNote.top }, 2.5);
+      } catch (error) {
+        this.$message.error({ content: 'Error creating note...', key: newNote.top }, 2.5);
+        console.log(error);
+      }
 
       await this.loadAll();
     },
 
     async remove(noteId) {
       this.$message.loading({ content: 'Removing note...', key: noteId });
-      await this.$http.delete(`notes/${noteId}`);
-      this.$message.success({ content: 'Note removed', key: noteId }, 2.5);
+      try {
+        await this.$http.delete(`notes/${noteId}`);
+        this.$message.success({ content: 'Note removed', key: noteId }, 2.5);
+      } catch (error) {
+        this.$message.error({ content: 'Error removing note...', key: noteId }, 2.5);
+        console.log(error);
+      }
 
       await this.loadAll();
     },
 
     async update(note) {
       this.$message.loading({ content: 'Updating note...', key: note.id });
-      await this.$http.patch(`notes/${note.id}`, note);
-      this.$message.success({ content: 'Note updated', key: note.id }, 2.5);
+      try {
+        await this.$http.patch(`notes/${note.id}`, note);
+        this.$message.success({ content: 'Note updated', key: note.id }, 2.5);
+      } catch (error) {
+        this.$message.error({ content: 'Error updating note...', key: note.id }, 2.5);
+        console.log(error);
+      }
 
       await this.loadAll();
     },

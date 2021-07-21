@@ -1,13 +1,14 @@
 import Vue from 'vue';
 import App from './App.vue';
 import VueShowdown from 'vue-showdown';
-import Button from 'ant-design-vue/lib/button';
+import { Button, message } from 'ant-design-vue';
 import 'ant-design-vue/dist/antd.css';
 import api from './config/api';
 
-Vue.prototype.$http = api;
 Vue.config.productionTip = false;
-Vue.component(Button.name, Button);
+Vue.prototype.$http = api;
+Vue.prototype.$message = message;
+Vue.use(Button);
 
 // the second parameter of Vue.use() is optional
 Vue.use(VueShowdown, {

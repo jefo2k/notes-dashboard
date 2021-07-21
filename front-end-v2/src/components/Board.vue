@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="board">
     <h1>{{ msg }}</h1>
-    <button @click="create()">Add note!</button>
+    <a-button type="primary" @click="create()">Add note!</a-button>
 
     <VueDragResize 
       v-for="note in notes" :key="note.id"
@@ -17,8 +17,8 @@
       contentClass="postit">
 
       <div class="postit-header">
-        <button @click="remove(note.id)">x</button>
-        <span>{{ note.top }} х {{ note.left }}</span>
+        <a-button type="primary" size="small" icon="close" @click="remove(note.id)" />
+        <span>{{ note.top }}х{{ note.left }}</span>
         <span>{{ note.createdAt }}</span>
       </div>
       
@@ -61,7 +61,8 @@ export default {
   data() {
     return {
       notes: [],
-      noteOnEditionMode: null
+      noteOnEditionMode: null,
+      loading: false
     }
   },
 
@@ -73,6 +74,7 @@ export default {
 
     async loadAll() {
       const response = await this.$http.get('notes');
+
       this.notes = response.data;
     },
 
@@ -83,19 +85,25 @@ export default {
         left: this.randomIntFromInterval()
       }
 
+      this.$message.loading({ content: 'Creating note...', key: newNote.top });
       await this.$http.post('notes', newNote);
+      this.$message.success({ content: 'Note created', key: newNote.top }, 2.5);
 
       await this.loadAll();
     },
 
     async remove(noteId) {
+      this.$message.loading({ content: 'Removing note...', key: noteId });
       await this.$http.delete(`notes/${noteId}`);
+      this.$message.success({ content: 'Note removed', key: noteId }, 2.5);
 
       await this.loadAll();
     },
 
     async update(note) {
+      this.$message.loading({ content: 'Updating note...', key: note.id });
       await this.$http.patch(`notes/${note.id}`, note);
+      this.$message.success({ content: 'Note updated', key: note.id }, 2.5);
 
       await this.loadAll();
     },
@@ -113,6 +121,7 @@ export default {
     randomIntFromInterval(min = 50, max = 150) {
       return Math.floor(Math.random() * (max - min + 1) + min)
     }
+
   },
 
   created(){
@@ -123,6 +132,10 @@ export default {
 </script>
 
 <style scoped>
+.board {
+  padding: 20px;
+}
+
 .postit {
   display: flex;
   flex-direction: column;
